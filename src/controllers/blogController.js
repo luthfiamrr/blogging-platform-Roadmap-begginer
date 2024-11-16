@@ -31,27 +31,54 @@ const addNewBlog = async (req, res) => {
   }
 };
 
-const getAllBlog = async (req, res) => {
-  try {
-    const blogs = await Blog.find();
+const getBlog = async (req, res) => {
+  const { title, category, tags } = req.query;
 
-    if (blogs.length === 0) {
+  if (!title && !category && !tags) {
+    return res.status(400).json({
+      status: 'gagal',
+      pesan: 'Salah satu parameter: title, category, tags harus diisi',
+    });
+  }
+
+  const query = {};
+
+  if (title) {
+    query.title = new RegExp(title, 'i');
+  }
+
+  if (category) {
+    query.category = new RegExp(category, 'i');
+  }
+
+  if (tags) {
+    const tagsArray = tags.split(',').map((tags) => tags.trim());
+    query.tags = { $in: tagsArray.map((tags) => new RegExp(tags, 'i')) };
+  }
+
+  try {
+    const findBlogs = await Blog.find(query);
+
+    if (!findBlogs) {
       return res.status(404).json({
         status: 'gagal',
-        pesan: 'Tidak ada blog yang ditemukan.',
+        pesan:
+          'Tidak ada blog yang ditemukan berdasarkan parameter yang diberikan',
       });
     }
 
-    res.status(200).json({
+    res.status(201).json({
       status: 'sukses',
-      pesan: 'Berhasil mendapatkan semua blog.',
-      data: blogs,
+      pesan: 'Berhasil mendapatkan blog',
+      data: findBlogs,
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      pesan: `Gagal mendapatkan semua blog: ${err.message}`,
-    });
+    if (err) {
+      return res.status(500).json({
+        status: 'Error',
+        pesan: `Terjadi kesalahan saat mendapatkan blog, ${err.message}`,
+      });
+    }
   }
 };
 
@@ -146,7 +173,7 @@ const deleteBlog = async (req, res) => {
 
 module.exports = {
   addNewBlog,
-  getAllBlog,
+  getBlog,
   getBlogById,
   updateBlog,
   deleteBlog,

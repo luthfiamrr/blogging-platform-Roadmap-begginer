@@ -23,7 +23,7 @@ const blogSchema = new Schema(
     tags: {
       type: [String],
       enum: {
-        values: ['Tech', 'Programming'],
+        values: ['Tech', 'Programming', 'Others'],
         message: '{VALUE} bukan tag yang didukung',
       },
     },
