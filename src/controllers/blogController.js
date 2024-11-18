@@ -3,7 +3,7 @@ const Blog = require('../models/blogModel');
 const addNewBlog = async (req, res) => {
   const { title, content, category, tags } = req.body;
 
-  if (!title && !content) {
+  if (!title || !content) {
     return res.status(400).json({
       status: 'gagal',
       pesan: 'Judul dan konten tidak boleh kosong.',
@@ -34,7 +34,9 @@ const addNewBlog = async (req, res) => {
 const getBlog = async (req, res) => {
   const { title, category, tags } = req.query;
 
-  if (!title && !category && !tags) {
+  const filledFields = [title, category, tags].filter(Boolean).length;
+
+  if (filledFields !== 1) {
     return res.status(400).json({
       status: 'gagal',
       pesan: 'Salah satu parameter: title, category, tags harus diisi',
@@ -112,7 +114,7 @@ const updateBlog = async (req, res) => {
   const { id } = req.params;
   const { title, content, category, tags } = req.body;
 
-  if (!title && !content) {
+  if (!title || !content) {
     return res.status(400).json({
       status: 'gagal',
       pesan: 'Judul dan konten tidak boleh kosong.',
