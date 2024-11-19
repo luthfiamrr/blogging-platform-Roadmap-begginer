@@ -3,10 +3,10 @@ const Blog = require('../models/blogModel');
 const addNewBlog = async (req, res) => {
   const { title, content, category, tags } = req.body;
 
-  if (!title || !content) {
+  if (!title || !content || !category || !tags) {
     return res.status(400).json({
       status: 'gagal',
-      pesan: 'Judul dan konten tidak boleh kosong.',
+      pesan: 'Semua field harus diisi.',
     });
   }
 
@@ -24,10 +24,11 @@ const addNewBlog = async (req, res) => {
       data: newBlog,
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'gagal',
-      pesan: `Gagal menambahkan blog baru: ${err.message}`,
-    });
+    if (err)
+      res.status(500).json({
+        status: 'gagal',
+        pesan: `Terjadi kesalahan saat menambahkan blog baru, ${err.message}`,
+      });
   }
 };
 
@@ -103,10 +104,12 @@ const getBlogById = async (req, res) => {
       data: blog,
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      pesan: `Terjadi kesalahan saat mendapatkan blog: ${err.message}`,
-    });
+    if (err) {
+      res.status(500).json({
+        status: 'error',
+        pesan: `Terjadi kesalahan saat mendapatkan blog: ${err.message}`,
+      });
+    }
   }
 };
 
@@ -143,7 +146,7 @@ const updateBlog = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: 'gagal',
-      pesan: `Gagal memperbarui blog: ${err.message}`,
+      pesan: `Terjadi kesalahan saat memperbarui blog: ${err.message}`,
     });
   }
 };
