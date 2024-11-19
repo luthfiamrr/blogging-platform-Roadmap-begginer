@@ -70,7 +70,7 @@ const getBlog = async (req, res) => {
       });
     }
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'sukses',
       pesan: 'Berhasil mendapatkan blog',
       data: findBlogs,
@@ -144,10 +144,12 @@ const updateBlog = async (req, res) => {
       data: updatedBlog,
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'gagal',
-      pesan: `Terjadi kesalahan saat memperbarui blog: ${err.message}`,
-    });
+    if (err) {
+      res.status(500).json({
+        status: 'gagal',
+        pesan: `Terjadi kesalahan saat memperbarui blog: ${err.message}`,
+      });
+    }
   }
 };
 
@@ -169,10 +171,12 @@ const deleteBlog = async (req, res) => {
       pesan: 'Blog berhasil dihapus.',
     });
   } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      pesan: `Terjadi kesalahan saat menghapus blog: ${err.message}`,
-    });
+    if (err) {
+      res.status(500).json({
+        status: 'error',
+        pesan: `Terjadi kesalahan saat menghapus blog: ${err.message}`,
+      });
+    }
   }
 };
 
